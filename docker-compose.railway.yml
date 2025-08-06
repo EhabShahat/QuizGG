@@ -1,0 +1,112 @@
+# Railway-optimized docker-compose for local development
+# This mirrors the Railway deployment structure
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      # Database
+      DB_URL: "postgresql://postgres:classquiz@db:5432/classquiz"
+      
+      # Redis
+      REDIS: "redis://redis:6379/0?decode_responses=True"
+      
+      # Core Configuration
+      SECRET_KEY: "dev-secret-key-change-in-production"
+      ROOT_ADDRESS: "http://localhost:3000"
+      MAX_WORKERS: "1"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      
+      # Search
+      MEILISEARCH_URL: "http://meilisearch:7700"
+      
+      # Email (disabled for development)
+      SKIP_EMAIL_VERIFICATION: "True"
+      
+      # Storage
+      STORAGE_BACKEND: "local"
+      STORAGE_PATH: "/app/data"
+      
+      # External APIs (optional)
+      VITE_CAPTCHA_ENABLED: "false"
+    volumes:
+      - ./uploads:/app/data
+    depends_on:
+      - db
+      - redis
+      - meilisearch
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: "http://api:80"
+      REDIS_URL: "redis://redis:6379/0?decode_responses=True"
+      VITE_CAPTCHA_ENABLED: "false"
+      NODE_ENV: "production"
+    depends_on:
+      - api
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: arq classquiz.worker.WorkerSettings
+    environment:
+      # Same as API service
+      DB_URL: "postgresql://postgres:classquiz@db:5432/classquiz"
+      REDIS: "redis://redis:6379/0?decode_responses=True"
+      SECRET_KEY: "dev-secret-key-change-in-production"
+      ROOT_ADDRESS: "http://localhost:3000"
+      MAX_WORKERS: "1"
+      MEILISEARCH_URL: "http://meilisearch:7700"
+      SKIP_EMAIL_VERIFICATION: "True"
+      STORAGE_BACKEND: "local"
+      STORAGE_PATH: "/app/data"
+    volumes:
+      - ./uploads:/app/data
+    depends_on:
+      - db
+      - redis
+      - meilisearch
+
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: "classquiz"
+      POSTGRES_DB: "classquiz"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  meilisearch:
+    image: getmeili/meilisearch:v0.28.0
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilisearch_data:/data.ms
+
+volumes:
+  postgres_data:
+  meilisearch_data:

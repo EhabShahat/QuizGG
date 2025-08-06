@@ -1,4 +1,4 @@
-#! /usr/bin/env sh
+#!/usr/bin/env sh
 
 # SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 #
