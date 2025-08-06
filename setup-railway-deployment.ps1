@@ -24,11 +24,11 @@ try {
     railway variables set ACCESS_TOKEN_EXPIRE_MINUTES="30"
     
     # Database and Redis (these will be auto-populated by Railway)
-    railway variables set DATABASE_URL='${{Postgres.DATABASE_URL}}'
-    railway variables set REDIS='${{Redis.REDIS_URL}}'
+    railway variables set DATABASE_URL="`${{Postgres.DATABASE_URL}}"
+    railway variables set REDIS="`${{Redis.REDIS_URL}}"
     
     # Meilisearch
-    railway variables set MEILISEARCH_URL='http://${{Meilisearch.RAILWAY_PRIVATE_DOMAIN}}:7700'
+    railway variables set MEILISEARCH_URL="http://`${{Meilisearch.RAILWAY_PRIVATE_DOMAIN}}:7700"
     
     # Email (disabled for now)
     railway variables set SKIP_EMAIL_VERIFICATION="True"
@@ -58,9 +58,9 @@ try {
     railway variables set ROOT_ADDRESS="https://your-frontend-domain.up.railway.app"
     railway variables set MAX_WORKERS="1"
     railway variables set ACCESS_TOKEN_EXPIRE_MINUTES="30"
-    railway variables set DATABASE_URL='${{Postgres.DATABASE_URL}}'
-    railway variables set REDIS='${{Redis.REDIS_URL}}'
-    railway variables set MEILISEARCH_URL='http://${{Meilisearch.RAILWAY_PRIVATE_DOMAIN}}:7700'
+    railway variables set DATABASE_URL="`${{Postgres.DATABASE_URL}}"
+    railway variables set REDIS="`${{Redis.REDIS_URL}}"
+    railway variables set MEILISEARCH_URL="http://`${{Meilisearch.RAILWAY_PRIVATE_DOMAIN}}:7700"
     railway variables set SKIP_EMAIL_VERIFICATION="True"
     railway variables set STORAGE_BACKEND="local"
     railway variables set STORAGE_PATH="/app/data"
@@ -78,8 +78,8 @@ Write-Host "Setting up Frontend service variables..." -ForegroundColor White
 try {
     railway service frontend
     
-    railway variables set API_URL='http://${{api.RAILWAY_PRIVATE_DOMAIN}}'
-    railway variables set REDIS_URL='${{Redis.REDIS_URL}}'
+    railway variables set API_URL="http://`${{api.RAILWAY_PRIVATE_DOMAIN}}"
+    railway variables set REDIS_URL="`${{Redis.REDIS_URL}}"
     railway variables set VITE_CAPTCHA_ENABLED="false"
     railway variables set NODE_ENV="production"
     
