@@ -25,6 +25,6 @@ COPY gunicorn_conf.py /app/
 
 EXPOSE 80
 ENV PYTHONPATH=/app
-RUN chmod +x start.sh && chmod +x railway-start.py
+RUN chmod +x railway-start.py
 ENV APP_MODULE=classquiz:app
-CMD ["python", "railway-start.py"]
+CMD ["python3", "railway-start.py"]
