@@ -19,11 +19,12 @@ COPY image_cleanup.py /app/image_cleanup.py
 COPY alembic.ini /app/
 COPY migrations/ /app/migrations/
 COPY *start.sh /app/
+COPY railway-start.py /app/
 COPY gunicorn_conf.py /app/
 
 
 EXPOSE 80
 ENV PYTHONPATH=/app
-RUN chmod +x start.sh
+RUN chmod +x start.sh && chmod +x railway-start.py
 ENV APP_MODULE=classquiz:app
-CMD ["./start.sh"]
+CMD ["python", "railway-start.py"]
